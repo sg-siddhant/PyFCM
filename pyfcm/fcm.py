@@ -1,7 +1,6 @@
 from .baseapi import BaseAPI
 from .errors import InvalidDataError
 
-
 class FCMNotification(BaseAPI):
     def notify(
         self,
@@ -9,6 +8,7 @@ class FCMNotification(BaseAPI):
         notification_title=None,
         notification_body=None,
         notification_image=None,
+        notification_sound=None,  # Added sound parameter
         data_payload=None,
         topic_name=None,
         topic_condition=None,
@@ -27,34 +27,25 @@ class FCMNotification(BaseAPI):
             notification_title (str, optional): Message title to display in the notification tray
             notification_body (str, optional): Message string to display in the notification tray
             notification_image (str, optional): Icon that appears next to the notification
-
+            notification_sound (str, optional): Sound to play when the notification is received
             data_payload (dict, optional): Arbitrary key/value payload, which must be UTF-8 encoded
-
-            topic_name (str, optional): Name of the topic to deliver messages to e.g. "weather".
-            topic_condition (str, optional): Condition to broadcast a message to, e.g. "'foo' in topics && 'bar' in topics".
-
-            android_config (dict, optional): Android specific options for messages - https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages#androidconfig
-            apns_config (dict, optional): Apple Push Notification Service specific options - https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages#apnsconfig
-            webpush_config (dict, optional): Webpush protocol options - https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages#webpushconfig
-            fcm_options (dict, optional): Platform independent options for features provided by the FCM SDKs - https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages#fcmoptions
-
+            topic_name (str, optional): Name of the topic to deliver messages to e.g. "weather"
+            topic_condition (str, optional): Condition to broadcast a message to
+            android_config (dict, optional): Android specific options for messages
+            apns_config (dict, optional): Apple Push Notification Service specific options
+            webpush_config (dict, optional): Webpush protocol options
+            fcm_options (dict, optional): Platform independent options
             timeout (int, optional): Set time limit for the request
 
         Returns:
-            dict: name (str) - The identifier of the message sent, in the format of projects/*/messages/{message_id}
-
-        Raises:
-            FCMServerError: FCM is temporary not available
-            AuthenticationError: error authenticating the sender account
-            InvalidDataError: data passed to FCM was incorrecly structured
-            FCMSenderIdMismatchError: the authenticated sender is different from the sender registered to the token
-            FCMNotRegisteredError: device token is missing, not registered, or invalid
+            dict: name (str) - The identifier of the message sent
         """
         payload = self.parse_payload(
             fcm_token=fcm_token,
             notification_title=notification_title,
             notification_body=notification_body,
             notification_image=notification_image,
+            notification_sound=notification_sound,  # Added sound parameter
             data_payload=data_payload,
             topic_name=topic_name,
             topic_condition=topic_condition,

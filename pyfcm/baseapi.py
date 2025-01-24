@@ -225,23 +225,23 @@ class BaseAPI(object):
             )
 
     def parse_payload(
-        self,
-        fcm_token=None,
-        notification_title=None,
-        notification_body=None,
-        notification_image=None,
-        data_payload=None,
-        topic_name=None,
-        topic_condition=None,
-        android_config=None,
-        apns_config=None,
-        webpush_config=None,
-        fcm_options=None,
-        dry_run=False,
+            self,
+            fcm_token=None,
+            notification_title=None,
+            notification_body=None,
+            notification_image=None,
+            notification_sound=None,  # Added sound parameter
+            data_payload=None,
+            topic_name=None,
+            topic_condition=None,
+            android_config=None,
+            apns_config=None,
+            webpush_config=None,
+            fcm_options=None,
+            dry_run=False,
     ):
         """
-
-        :rtype: json
+        Parse payload for FCM notification
         """
         fcm_payload = dict()
 
@@ -283,16 +283,16 @@ class BaseAPI(object):
             else:
                 raise InvalidDataError("Provided fcm_options is in the wrong format")
 
-        fcm_payload["notification"] = (
-            {}
-        )  # - https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages#notification
-        # If title is present, use it
+        fcm_payload["notification"] = {}
+
         if notification_title:
             fcm_payload["notification"]["title"] = notification_title
         if notification_body:
             fcm_payload["notification"]["body"] = notification_body
         if notification_image:
             fcm_payload["notification"]["image"] = notification_image
+        if notification_sound:  # Added sound handling
+            fcm_payload["notification"]["sound"] = notification_sound
 
         # Do this if you only want to send a data message.
         if data_payload and (not notification_title and not notification_body):
