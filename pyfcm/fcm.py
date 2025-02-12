@@ -3,21 +3,22 @@ from .errors import InvalidDataError
 
 class FCMNotification(BaseAPI):
     def notify(
-        self,
-        fcm_token=None,
-        notification_title=None,
-        notification_body=None,
-        notification_image=None,
-        notification_sound=None,  # Added sound parameter
-        data_payload=None,
-        topic_name=None,
-        topic_condition=None,
-        android_config=None,
-        webpush_config=None,
-        apns_config=None,
-        fcm_options=None,
-        dry_run=False,
-        timeout=120,
+            self,
+            fcm_token=None,
+            notification_title=None,
+            notification_body=None,
+            notification_image=None,
+            data_payload=None,
+            topic_name=None,
+            topic_condition=None,
+            android_config=None,
+            webpush_config=None,
+            apns_config=None,
+            fcm_options=None,
+            sound=None,  # New unified sound parameter
+            android_channel_id=None,  # New parameter for Android channel
+            dry_run=False,
+            timeout=120,
     ):
         """
         Send push notification to a single device
@@ -27,7 +28,6 @@ class FCMNotification(BaseAPI):
             notification_title (str, optional): Message title to display in the notification tray
             notification_body (str, optional): Message string to display in the notification tray
             notification_image (str, optional): Icon that appears next to the notification
-            notification_sound (str, optional): Sound to play when the notification is received
             data_payload (dict, optional): Arbitrary key/value payload, which must be UTF-8 encoded
             topic_name (str, optional): Name of the topic to deliver messages to e.g. "weather"
             topic_condition (str, optional): Condition to broadcast a message to
@@ -35,17 +35,34 @@ class FCMNotification(BaseAPI):
             apns_config (dict, optional): Apple Push Notification Service specific options
             webpush_config (dict, optional): Webpush protocol options
             fcm_options (dict, optional): Platform independent options
+            sound (str, optional): Sound file name to play for the notification
+            android_channel_id (str, optional): Android notification channel ID
             timeout (int, optional): Set time limit for the request
 
         Returns:
             dict: name (str) - The identifier of the message sent
         """
+        # Handle Android sound configuration
+        if sound and android_channel_id:
+            android_config = android_config or {}
+            android_config["notification"] = android_config.get("notification", {})
+            android_config["notification"].update({
+                "sound": sound,
+                "channel_id": android_channel_id
+            })
+
+        # Handle APNS sound configuration
+        if sound:
+            apns_config = apns_config or {}
+            apns_config["payload"] = apns_config.get("payload", {})
+            apns_config["payload"]["aps"] = apns_config["payload"].get("aps", {})
+            apns_config["payload"]["aps"]["sound"] = sound
+
         payload = self.parse_payload(
             fcm_token=fcm_token,
             notification_title=notification_title,
             notification_body=notification_body,
             notification_image=notification_image,
-            notification_sound=notification_sound,  # Added sound parameter
             data_payload=data_payload,
             topic_name=topic_name,
             topic_condition=topic_condition,
